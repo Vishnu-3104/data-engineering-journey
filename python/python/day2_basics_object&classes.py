@@ -1,33 +1,55 @@
+#with function callback() and some methods added
 class Car:
-    # Class attribute (shared by all instances)
-    max_speed = 120  # Maximum speed in km/h
+    max_speed = 120
 
-    # Constructor method (initialize instance attributes)
     def __init__(self, make, model, color, speed=0):
         self.make = make
         self.model = model
         self.color = color
-        self.speed = speed  # Initial speed is set to 0
+        self.speed = max(0, speed)
 
-    # Method for accelerating the car
     def accelerate(self, acceleration):
-        if self.speed + acceleration <= Car.max_speed:
-            self.speed += acceleration
-        else:
-            self.speed = Car.max_speed
+        if acceleration < 0:
+            raise ValueError("Acceleration cannot be negative. Use brake() instead.")
+        
+        new_speed = self.speed + acceleration
+        self.speed = min(new_speed, self.max_speed)
 
-    # Method to get the current speed of the car
+    def brake(self, deceleration):
+        if deceleration < 0:
+            raise ValueError("Deceleration cannot be negative.")
+        
+        new_speed = self.speed - deceleration
+        self.speed = max(new_speed, 0)
+
     def get_speed(self):
         return self.speed
-      
-# Create objects (instances) of the Car class
-car1 = Car("Toyota", "Camry", "Blue")
-car2 = Car("Honda", "Civic", "Red")
 
-# Accelerate the cars
-car1.accelerate(30)
-car2.accelerate(20)
+    def __str__(self):
+        return f"{self.color} {self.make} {self.model} traveling at {self.speed} km/h"
 
-# Print the current speeds of the cars
-print(f"{car1.make} {car1.model} is currently at {car1.get_speed()} km/h.")
-print(f"{car2.make} {car2.model} is currently at {car2.get_speed()} km/h.")
+
+if __name__ == "__main__":
+    car1 = Car("Toyota", "Camry", "Blue")
+    car2 = Car("Honda", "Civic", "Red", speed=50)
+    car3 = Car("Audi", "A8", "Black")
+
+    car1.accelerate(30)
+    car2.brake(20)
+    car3.accelerate(50)
+
+
+    print(car1)
+    print(car2)
+    print(car3)
+
+    # Testing limits
+    car1.accelerate(200)   # Should cap at max_speed
+    car2.brake(10)   # Should not go below 0
+    car3.brake(10)
+    car1.brake(20)
+
+    print("\nAfter limit testing:")
+    print(car1)
+    print(car2)
+    print(car3)
